@@ -1,8 +1,9 @@
 import express from "express";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
-import productRouter from "./routers/productRouter.js";
 import userRouter from "./routers/userRouter.js";
+import orderRouter from "./routers/orderRouter.js";
+import productRouter from "./routers/productRouter.js";
 
 dotenv.config();
 
@@ -17,6 +18,7 @@ mongoose.connect(process.env.MONGODB_URL || "mongodb://localhost/amazona_one", {
 });
 
 app.use("/api/users", userRouter);
+app.use("/api/orders", orderRouter);
 app.use("/api/products", productRouter);
 
 app.get("/", (req, res) => {
