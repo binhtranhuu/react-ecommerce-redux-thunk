@@ -20,15 +20,21 @@ import {
   PRODUCT_UPDATE_SUCCESS,
 } from "../constants/productConstants";
 
-export const listProducts = ({ seller = "", name = "", category = "" }) => async (
-  dispatch
-) => {
+export const listProducts = ({
+  seller = "",
+  name = "",
+  category = "",
+  order = "",
+  min = 0,
+  max = 0,
+  rating = 0,
+}) => async (dispatch) => {
   dispatch({
     type: PRODUCT_LIST_REQUEST,
   });
   try {
     const { data } = await Axios.get(
-      `/api/products?seller=${seller}&name=${name}&category=${category}`
+      `/api/products?seller=${seller}&name=${name}&category=${category}&min=${min}&max=${max}&rating=${rating}&order=${order}`
     );
     dispatch({ type: PRODUCT_LIST_SUCCESS, payload: data });
   } catch (error) {
