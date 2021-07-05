@@ -131,7 +131,7 @@ function App() {
                     <Link to="/dashboard">Dashboard</Link>
                   </li>
                   <li>
-                    <Link to="/productlist">Products</Link>
+                    <Link to="/productlist/pageNumber/1">Products</Link>
                   </li>
                   <li>
                     <Link to="/orderlist">Orders</Link>

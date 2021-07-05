@@ -30,7 +30,7 @@ export default function ProductEditScreen(props) {
 
   useEffect(() => {
     if (successUpdate) {
-      props.history.push("/productlist");
+      props.history.push("/productlist/pageNumber/1");
     }
     if (!product || product._id !== productId || successUpdate) {
       dispatch({ type: PRODUCT_UPDATE_RESET });
@@ -74,7 +74,7 @@ export default function ProductEditScreen(props) {
     bodyFormData.append("image", file);
     setLoadingUpload(true);
     try {
-      const { data } = await Axios.post("/api/uploads", bodyFormData, {
+      const { data } = await Axios.post("/api/uploads/s3", bodyFormData, {
         headers: {
           "Content-Type": "multipart/form-data",
           Authorization: `Bearer ${userInfo.token}`,
