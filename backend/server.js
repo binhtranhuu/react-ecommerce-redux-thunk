@@ -1,4 +1,6 @@
 import express from "express";
+import http from "http";
+import { Server } from "socket.io";
 import mongoose from "mongoose";
 import path from "path";
 import userRouter from "./routers/userRouter.js";
@@ -38,6 +40,14 @@ app.use((err, req, res, next) => {
 });
 
 const port = config.PORT;
-app.listen(port, () => {
+
+const httpServer = http.Server(app);
+const io = new Server(httpServer, { cors: { origin: "*" } });
+
+httpServer.listen(port, () => {
   console.log(`Serve at http://localhost:${port}`);
 });
+
+// app.listen(port, () => {
+//   console.log(`Serve at http://localhost:${port}`);
+// });
