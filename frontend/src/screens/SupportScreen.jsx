@@ -1,12 +1,18 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import socketIOClient from "socket.io-client";
 import { useSelector } from "react-redux";
 import MessageBox from "../components/MessageBox";
 
 let allUsers = [];
 let allMessages = [];
 let allSelectedUser = {};
+const ENDPOINT =
+  window.location.host.indexOf("localhost") >= 0
+    ? "http://127.0.0.1:5000"
+    : window.location.host;
 
 function SupportScreen(props) {
+  const [socket, setSocket] = useState(null);
   const [selectedUser, setSelectedUser] = useState({});
   const uiMessagesRef = useRef(null);
   const [messageBody, setMessageBody] = useState("");
@@ -15,6 +21,60 @@ function SupportScreen(props) {
 
   const userSignin = useSelector((state) => state.userSignin);
   const { userInfo } = userSignin;
+
+  useEffect(() => {
+    if (uiMessagesRef.current) {
+      uiMessagesRef.current.scrollBy({
+        top: uiMessagesRef.current.clientHeight,
+        left: 0,
+        behavior: "smooth",
+      });
+    }
+
+    if (!socket) {
+      const sk = socketIOClient(ENDPOINT);
+      setSocket(sk);
+      sk.emit("onLogin", {
+        _id: userInfo._id,
+        name: userInfo.name,
+        isAdmin: userInfo.isAdmin,
+      });
+      sk.on("message", (data) => {
+        if (allSelectedUser._id === data._id) {
+          allMessages = [...allMessages, data];
+        } else {
+          const existUser = allUsers.find((user) => user._id === data._id);
+          if (existUser) {
+            allUsers = allUsers.map((user) =>
+              user._id === existUser._id ? { ...user, unread: true } : user
+            );
+            setUsers(allUsers);
+          }
+        }
+        setMessages(allMessages);
+      });
+      sk.on("updateUser", (updatedUser) => {
+        const existUser = allUsers.find((user) => user._id === updatedUser._id);
+        if (existUser) {
+          allUsers = allUsers.map((user) =>
+            user._id === existUser._id ? updatedUser : user
+          );
+          setUsers(allUsers);
+        } else {
+          allUsers = [...allUsers, updatedUser];
+          setUsers(allUsers);
+        }
+      });
+      sk.on("listUsers", (updatedUsers) => {
+        allUsers = updatedUsers;
+        setUsers(allUsers);
+      });
+      sk.on("selectUser", (user) => {
+        allMessages = user.messages;
+        setMessages(allMessages);
+      });
+    }
+  }, [messages, socket, users]);
 
   const selectUser = (user) => {};
 
